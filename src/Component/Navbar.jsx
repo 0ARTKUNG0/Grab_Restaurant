@@ -2,7 +2,7 @@ import React from 'react'
 
 const Navbar = () => {
     const MenuItem = [
-    { name: "Add restaurant", url: "/Add_restaurant" },
+    { name: "Add restaurant", url: "/Add_Restaurant" },
     { name: "Search", url: "/Search" },
     { name: "About Us", url: "/About_Us" },
     ];
