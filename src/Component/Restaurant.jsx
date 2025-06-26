@@ -1,19 +1,24 @@
 import React from 'react'
 import Card from './Card'
 
-const Restaurant = ({ restaurants = [] }) => {
+const Restaurant = ({ restaurants = [], onRefresh }) => {
+  const handleDelete = (deletedId) => {
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
   return (
     <div className="min-h-screen py-8">
       <div className='flex flex-wrap justify-center items-center gap-6 px-4'>
-        { // เช็คว่ามี restaurants หรือไม่
-        }
         {restaurants.length > 0 ? (
           restaurants.map((restaurant) => (
             <Card 
               key={restaurant.id}
+              id={restaurant.id}
               title={restaurant.title} 
               type={restaurant.type} 
               img={restaurant.img}
+              onDelete={handleDelete}
             />
           ))
         ) : (

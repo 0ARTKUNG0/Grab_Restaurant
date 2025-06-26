@@ -3,15 +3,16 @@ import Navbar from '../Component/Navbar'
 import Restaurant from '../Component/Restaurant'
 
 const Home = () => {
-const [restaurants, setRestaurants] = useState([]);
-const [loading, setLoading] = useState(true);
+  const [restaurants, setRestaurants] = useState([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-useEffect(() => {
   const fetchRestaurants = async () => {
     try {
       const response = await fetch('http://localhost:3001/restaurants');
       const data = await response.json();
       setRestaurants(data);
+      setFilteredRestaurants(data);
       setLoading(false);
     } catch (error) {
       console.error('Error ไม่สามารถดู restaurants ได้:', error);
@@ -19,8 +20,26 @@ useEffect(() => {
     }
   };
 
-  fetchRestaurants();
-}, []);
+  useEffect(() => {
+    fetchRestaurants();
+  }, []);
+  const handleSearch = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (searchTerm === '') {
+      setFilteredRestaurants(restaurants);
+    } else {
+      const filtered = restaurants.filter(restaurant =>
+        restaurant.title.toLowerCase().includes(searchTerm) ||
+        restaurant.type.toLowerCase().includes(searchTerm)
+      );
+      setFilteredRestaurants(filtered);
+    }
+  };
+
+  const handleRefresh = () => {
+    setLoading(true);
+    fetchRestaurants();
+  };
 
   if (loading) {
     return (
@@ -32,38 +51,32 @@ useEffect(() => {
       </div>
     );
   }
-
   return (
     <div className='container mx-auto'>
       <Navbar />
-      {/* This is a comment to indicate where the Navbar component is used */}
-
       <div className='title justify-center items-center flex flex-col mt-10'>
         <h1 className='text-4xl font-bold mb-4'>Grab Restaurant</h1>
       </div>
       
-      <div className='flex justify-center items-center flex-col mt-10'>
-        <label className="input">
-          <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <g
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="2.5"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.3-4.3"></path>
-            </g>
-          </svg>
-            <input 
-              type="search" 
-              placeholder="Search restaurants..." 
-            />
-        </label>
+      <div className='flex justify-center items-center flex-col mt-10 mb-8'>
+        <div className="relative w-full max-w-md">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input 
+            type="search" 
+            placeholder="Search restaurants..." 
+            className="input input-bordered w-full pl-10 pr-4"
+            onChange={handleSearch}
+          />
+        </div>
       </div>
-      
-      <Restaurant restaurants={restaurants} />
+      <Restaurant 
+        restaurants={filteredRestaurants} 
+        onRefresh={handleRefresh}
+      />
     </div>
   )
 }
